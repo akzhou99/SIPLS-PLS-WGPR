@@ -35,7 +35,7 @@ A modular implementation of the ECS spectral workflow for quantitative mineral p
 
 ## Input workbook
 
-Use the fixed Excel column layout described in [INPUT_FORMAT.md](INPUT_FORMAT.md). Training workbooks contain 1,038 columns; prediction-only workbooks contain 1,030 columns. The first column is the well name, the second is depth, followed by 514 net-inelastic channels, 514 net-capture channels, and (for training) eight mineral contents.
+Use the Excel layout described in [INPUT_FORMAT.md](INPUT_FORMAT.md). The first **1,030 columns** have a fixed structure: well name, depth, 514 net-inelastic channels, and 514 net-capture channels. **Labeled workbooks contain an additional K mineral-content columns**, where K is chosen according to the study area (for example, 3, 4, or 8 minerals). Thus, labeled datasets contain **1,030 + K columns**, while prediction-only datasets contain **1,030 columns**. The mineral target names, counts, and order must be consistent across all labeled sheets used by one model.
 
 ### Example dataset: synthetic data only
 
@@ -96,7 +96,7 @@ This quick test shows how to check the input workbook, train the SIPLS–PLS–S
 ### Notes
 
 - The included example workbook, if published in `data/Input data.xlsx`, must contain **synthetic data only**. It is **not real ECS/XRD measurement data**. Users must replace it with their own data before conducting scientific analysis.
-- Prepare **1,038 columns** for labeled training/test worksheets or **1,030 columns** for prediction-only worksheets, as specified in [INPUT_FORMAT.md](INPUT_FORMAT.md).
+- Prepare **1,030 + K columns** for labeled training/test worksheets, where **K** is the number of mineral targets (e.g., 3, 4, or 8), or **1,030 columns** for prediction-only worksheets, as described in [INPUT_FORMAT.md](INPUT_FORMAT.md).
 - Edit `config.py` to match your own Excel file path, worksheet names, and distinct training/test/external well identifiers. Prediction commands require the corresponding test or external partitions.
 - Full SSA-based optimization can be computationally expensive. This example is a workflow demonstration, not a guarantee of a short training time or reproduction of manuscript results.
 - Do not interpret prediction errors calculated from simulated data as evidence of field performance. Evaluate performance using independent real-well measurements.
@@ -139,8 +139,10 @@ PLS solver settings: `max_iter=2000`, `tol=1e-6` (shared by CV and final PLS fit
 
 ## Raw ECS worksheets
 
-The `net` command expects four headerless worksheets named `SBUR`, `SEAR`, `SLAT`, and `STAU`, each with depth followed by 514 channels. The output uses `Well_ID` (when provided), `Depth`, 514 net-inelastic channels, and 514 net-capture channels. For the training workbook, place the well name first, depth second, and append eight mineral columns.
+The `net` command expects four headerless worksheets named `SBUR`, `SEAR`, `SLAT`, and `STAU`, each with depth followed by 514 channels. The output uses `Well_ID` (when provided), `Depth`, 514 net-inelastic channels, and 514 net-capture channels. For a labeled workbook, place the well name first, depth second, and append the **K mineral columns** selected for your study area.
 
 The `align` command expects an XRD worksheet named `XRD` by default (override with `--xrd-sheet`).
 
 The default training workbook is `data/Input data.xlsx`; set `ECS_DATA_FILE` or edit `DATA_FILE` in `config.py` to use another path.
+
+**Target-count compatibility:** The intended format supports a study-dependent number of minerals, but existing code may still contain an eight-target assumption. Confirm that the input reader and downstream training/prediction code handle `K` targets before using three-, four-, or other non-eight-mineral datasets.
