@@ -3,7 +3,7 @@
 from pathlib import Path
 import os
 
-DATA_FILE = Path(r"E:\data\Input data.xlsx")
+DATA_FILE = Path(r"E:\example\Input data.xlsx")
 
 TRAIN_SHEETS = ["Train well"]
 TEST_SHEETS = ["Test well"]
