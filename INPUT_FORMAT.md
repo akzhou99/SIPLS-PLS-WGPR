@@ -1,20 +1,10 @@
 # Input data format
 
-The project uses one fixed Excel column layout. Please prepare the workbook in this format; the reader does not try to infer alternative layouts.
+The workbook uses a fixed ordering for the well identifier, depth, and two ECS net spectra, followed by a **study-dependent number of mineral targets**. The number of minerals is **not fixed at eight**.
 
-## Training workbook — 1,038 columns
+## Labeled workbook — 1,030 + K columns
 
-| Column positions | Content | Number of columns |
-|---|---|---:|
-| 1 | Well name | 1 |
-| 2 | Depth | 1 |
-| 3–516 | Net inelastic spectrum | 514 |
-| 517–1030 | Net capture spectrum | 514 |
-| 1031–1038 | Mineral contents | 8 |
-
-The eight mineral columns should use consistent names and order in every worksheet. Each row represents one depth sample. Do not add an Excel index column. The first row contains column headers.
-
-## Prediction workbook — 1,030 columns
+Here, **K** is the number of mineral components selected for the study area (for example, K = 3, 4, or 8).
 
 | Column positions | Content | Number of columns |
 |---|---|---:|
@@ -22,14 +12,31 @@ The eight mineral columns should use consistent names and order in every workshe
 | 2 | Depth | 1 |
 | 3–516 | Net inelastic spectrum | 514 |
 | 517–1030 | Net capture spectrum | 514 |
+| 1031–(1030 + K) | Mineral contents | K |
 
-Prediction data may also contain the final eight mineral columns when reference measurements are available. If present, all eight values in a row must be filled to calculate evaluation metrics.
+Examples: **3 minerals = 1,033 columns; 4 minerals = 1,034 columns; 8 minerals = 1,038 columns.**
 
-## Important
+Each mineral target occupies one column, with the **mineral name as its column header** (e.g., `Quartz`, `Calcite`, `Clay`). Choose the mineral targets according to the study area. Every row represents one depth sample; the first row contains column headers.
 
-- The default spectral order is **net inelastic first, then net capture**. If the workbook uses the reverse order, change `SPECTRA_ORDER` in `config.py` to `"capture-first"`.
-- Well names must be filled in on every row and must match the names in `TRAIN_WELLS`, `TEST_WELLS`, and `EXTERNAL_WELLS`.
-- Training, test, and external-validation wells must be disjoint.
-- The training workbook must contain eight numeric, nonnegative mineral contents per sample.
-- Spectral channels and depth must be numeric and contain no blank values.
-- Do not include an extra index column or other metadata columns.
+## Prediction-only workbook — 1,030 columns
+
+| Column positions | Content | Number of columns |
+|---|---|---:|
+| 1 | Well name | 1 |
+| 2 | Depth | 1 |
+| 3–516 | Net inelastic spectrum | 514 |
+| 517–1030 | Net capture spectrum | 514 |
+
+Prediction or test worksheets may also include **K reference mineral columns** when measured labels are available and evaluation metrics are required. In that case, the mineral columns must match the training targets in **name, number, and order**.
+
+## Requirements
+
+- Keep the first **1,030 columns** in the specified order. Do not add Excel index or other metadata columns.
+- Select **K mineral targets** from the geology of your study area. Use the same K targets, column names, and order throughout the labeled datasets for one trained model.
+- Mineral contents must be numeric and nonnegative; labeled rows used for training or evaluation must have values for all K targets.
+- Spectral channels and depth must be numeric and contain no missing values. Well names must be present for every row.
+- Training, test, and external-validation wells must not overlap.
+- The default spectral order is **net inelastic, then net capture**. If using the reverse order, set `SPECTRA_ORDER = "capture-first"` in `config.py`.
+- The supplied example workbook is **synthetic demonstration data**, not field measurements. Replace it with your own appropriately prepared ECS and mineral-composition data for research use.
+
+**Implementation compatibility:** This document specifies the intended flexible target layout. If your current version of the Python scripts assumes exactly eight mineral columns, update the reader and any downstream target-count checks before using a dataset with K other than eight. Updating this document alone does not change the code.
