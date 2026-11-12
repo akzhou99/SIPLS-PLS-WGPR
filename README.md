@@ -146,3 +146,11 @@ The `align` command expects an XRD worksheet named `XRD` by default (override wi
 The default training workbook is `data/Input data.xlsx`; set `ECS_DATA_FILE` or edit `DATA_FILE` in `config.py` to use another path.
 
 **Target-count compatibility:** The intended format supports a study-dependent number of minerals, but existing code may still contain an eight-target assumption. Confirm that the input reader and downstream training/prediction code handle `K` targets before using three-, four-, or other non-eight-mineral datasets.
+
+## Example Dataset
+
+A synthetic Excel workbook is provided in the [example](example/) directory to demonstrate the required input format and basic model workflow.
+
+**The example dataset is simulated and does not contain real ECS spectra or measured XRD mineral compositions.** Users should replace it with their own data before conducting scientific analysis.
+
+See [example/README.md](example/README.md) for the data structure, configuration instructions, and quick-test commands.
