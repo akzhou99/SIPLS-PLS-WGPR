@@ -1,4 +1,4 @@
-# SIPLS–PLS–SSA-WGPR
+# SIPLS–PLS-WGPR
 
 A modular implementation of the ECS spectral workflow for quantitative mineral prediction.
 
